@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+scikit-learn
+sentence-transformers
+groq
+python-dotenv
+numpy
+pandas
