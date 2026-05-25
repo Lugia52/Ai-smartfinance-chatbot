@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
+from fastapi.responses import FileResponse
 from groq import Groq
 
 import pickle
@@ -110,9 +110,7 @@ def ask_groq(query):
 
 @app.get("/")
 def home():
-    return {
-        "status": "Hybrid Smart Finance API Running"
-    }
+    return FileResponse("index.html")
 
 # =========================
 # CHAT
