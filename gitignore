@@ -1,21 +1,16 @@
 # Python
 __pycache__/
 *.pyc
-*.pyo
-.venv/
-venv/
-env/
 
 # Environment
 .env
 
-# Model files (terlalu besar untuk GitHub, upload manual atau pakai Git LFS)
-backend/ml/*.h5
-backend/ml/*.pkl
+# Jupyter
+.ipynb_checkpoints/
+
+# Models
+*.pkl
 
 # OS
 .DS_Store
 Thumbs.db
-
-# Notebook checkpoints
-.ipynb_checkpoints/
