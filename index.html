@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Smart Finance AI</title>
 
   <style>
+
     body{
       background:#0f172a;
       color:white;
@@ -12,13 +14,15 @@
       justify-content:center;
       align-items:center;
       height:100vh;
+      margin:0;
     }
 
     .chat-container{
-      width:400px;
+      width:420px;
       background:#1e293b;
       border-radius:12px;
       padding:20px;
+      box-sizing:border-box;
     }
 
     .messages{
@@ -32,6 +36,7 @@
       padding:10px;
       border-radius:10px;
       margin-bottom:10px;
+      line-height:1.4;
     }
 
     input{
@@ -39,6 +44,7 @@
       padding:12px;
       border:none;
       border-radius:8px;
+      box-sizing:border-box;
     }
 
     button{
@@ -50,8 +56,15 @@
       background:#2563eb;
       color:white;
       cursor:pointer;
+      font-weight:bold;
     }
+
+    button:hover{
+      opacity:0.9;
+    }
+
   </style>
+
 </head>
 
 <body>
@@ -60,12 +73,16 @@
 
   <h2>Smart Finance AI</h2>
 
-  <div class="messages" id="messages"></div>
+  <div
+    class="messages"
+    id="messages">
+  </div>
 
   <input
     type="text"
     id="input"
     placeholder="Ketik pesan..."
+    onkeypress="handleEnter(event)"
   >
 
   <button onclick="sendMessage()">
@@ -78,44 +95,116 @@
 
 async function sendMessage(){
 
-  const input = document.getElementById("input");
+  const input =
+    document.getElementById("input");
 
-  const text = input.value;
+  const text =
+    input.value.trim();
+
+  if(text === ""){
+    return;
+  }
 
   const messages =
     document.getElementById("messages");
 
-  messages.innerHTML += `
-    <div class="message">
-      Kamu: ${text}
-    </div>
-  `;
-
-  const response = await fetch(
-    "https://ai-smartfinance-chatbot-production.up.railway.app/chat",
-    {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        message:text
-      })
-    }
-  );
-
-  const data = await response.json();
+  // USER MESSAGE
 
   messages.innerHTML += `
     <div class="message">
-      Bot: ${data.answer}
+      <b>Kamu:</b> ${text}
     </div>
   `;
+
+  messages.scrollTop =
+    messages.scrollHeight;
 
   input.value = "";
+
+  // LOADING
+
+  messages.innerHTML += `
+    <div class="message" id="loading">
+      Bot sedang mengetik...
+    </div>
+  `;
+
+  messages.scrollTop =
+    messages.scrollHeight;
+
+  try{
+
+    const response = await fetch(
+      "/chat",
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+          message:text
+        })
+
+      }
+    );
+
+    const data =
+      await response.json();
+
+    // HAPUS LOADING
+
+    document
+      .getElementById("loading")
+      .remove();
+
+    // BOT MESSAGE
+
+    messages.innerHTML += `
+      <div class="message">
+        <b>Bot:</b> ${data.answer}
+        <br><br>
+        <small>
+          Source: ${data.source}
+          |
+          Confidence:
+          ${Number(data.confidence).toFixed(2)}
+        </small>
+      </div>
+    `;
+
+    messages.scrollTop =
+      messages.scrollHeight;
+
+  }
+
+  catch(error){
+
+    document
+      .getElementById("loading")
+      .remove();
+
+    messages.innerHTML += `
+      <div class="message">
+        Error connect ke server.
+      </div>
+    `;
+  }
+
+}
+
+function handleEnter(event){
+
+  if(event.key === "Enter"){
+    sendMessage();
+  }
+
 }
 
 </script>
 
 </body>
+
 </html>
