@@ -145,27 +145,15 @@ def chat(req: ChatRequest):
     # HYBRID ROUTING
     # =====================
 
-    # Intent yang butuh data user → selalu ke Groq
-    DATA_INTENTS = {"expense", "income", "saving"}
+    # Intent yang bisa dijawab lokal (saran murni, tidak butuh data user)
+    LOCAL_INTENTS = {"budgeting", "investment", "fraud"}
 
-    # Intent salam / general → tanya dulu mau ngapain
-    GREETING_INTENTS = {"general", "greeting"}
-
-    if proba >= 0.55 and pred in GREETING_INTENTS:
-        answer = (
-            "Halo! 👋 Saya Smart Finance Chatbot. Mau ngapain nih?\n\n"
-            "💡 Minta saran keuangan\n"
-            "📊 Cek data keuangan saya\n"
-            "🔒 Tanya soal keamanan finansial\n"
-            "💬 Tanya bebas"
-        )
-        source = "LOCAL"
-
-    elif proba >= 0.55 and pred in responses and pred not in DATA_INTENTS:
+    if proba >= 0.55 and pred in LOCAL_INTENTS:
         answer = random.choice(responses[pred])
         source = "LOCAL"
 
     else:
+        # Semua selain itu → Groq (termasuk expense, income, saving, general, dll)
         answer = ask_groq(query)
         source = "API_GROQ"
 
